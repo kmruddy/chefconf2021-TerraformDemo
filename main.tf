@@ -82,22 +82,24 @@ resource "vsphere_virtual_machine" "vm" {
       ipv4_gateway    = "192.168.1.254"
     }
   }
+}
 
-  provisioner "remote-exec" {
+resource "null_resource" "run_chef" {
+  depends_on = [vsphere_virtual_machine.vm, ]
 
-    connection {
-      type     = "ssh"
-      user     = "kruddy"
-      password = var.pw
-      host     = var.ip
-    }
+  connection {
+    type     = "ssh"
+    user     = "root"
+    password = var.pw
+    host     = var.ip
+  }
 
-    inline = [
-      "wget -O /tmp/chef.deb https://packages.chef.io/files/stable/chef/17.3.48/ubuntu/18.04/chef_17.3.48-1_amd64.deb",
-      "echo ${var.pw} | sudo -S dpkg -i /tmp/chef.deb",
-      "sudo wget -O /etc/chef/client.rb ftp://192.168.1.125/chef/client02/client.rb",
-      "sudo wget -O /etc/chef/client.pem ftp://192.168.1.125/chef/client02/client.pem",
-      "sudo chef-client",
-    ]
+  provisioner "chef" {
+    client_options = ["chef_license 'accept'"]
+    node_name      = "chefdemo01"
+    server_url     = "https://api.chef.io/organizations/tfdemo"
+    user_name      = "kmruddy"
+    user_key       = var.user_pem
+    run_list       = ["role[sample_role]"]
   }
 }

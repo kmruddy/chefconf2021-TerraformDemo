@@ -27,7 +27,7 @@ variable "folder_name" {
 }
 
 variable "vm_name" {
-  default = "chefdemo02"
+  default = "chefdemo01"
 }
 
 variable "pw" {
@@ -35,5 +35,7 @@ variable "pw" {
 }
 
 variable "ip" {
-  default = "192.168.1.162"
+  default = "192.168.1.161"
 }
+
+variable "user_pem" {}
